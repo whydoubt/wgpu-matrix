@@ -23,7 +23,7 @@
 import * as utils from './utils.js';
 import { Quat } from './quat';
 import { Mat3 } from './mat3';
-import { Mat4 } from './mat4';
+import { Mat4Arg } from './mat4';
 import Vec2, * as vec2 from './vec2-impl';
 
 export default Mat3;
@@ -187,7 +187,7 @@ export function set(
  * @param dst - matrix to hold result. If not passed a new one is created.
  * @returns Mat3 made from m4
  */
-export function fromMat4(m4: Mat4, dst?: Mat3): Mat3 {
+export function fromMat4(m4: Mat4Arg, dst?: Mat3): Mat3 {
   dst = dst || newMat3();
   dst[0] = m4[0];  dst[1] = m4[1];  dst[ 2] = m4[ 2];  dst[ 3] = 0;
   dst[4] = m4[4];  dst[5] = m4[5];  dst[ 6] = m4[ 6];  dst[ 7] = 0;

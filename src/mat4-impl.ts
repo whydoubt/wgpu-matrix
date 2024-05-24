@@ -1,13 +1,12 @@
 
 import { Mat3 } from './mat3';
-import { Mat4 } from './mat4';
+import { Mat4Arg } from './mat4';
 import { Quat } from './quat';
 import Vec3, * as vec3 from './vec3-impl';
 import * as utils from './utils';
 
-export default Mat4;
-
-export type Mat4LikeCtor = new (n: number) => Mat4;
+export function getAPI<T extends Mat4Arg>(MatType: new(n: number) => T) {
+  type Mat4 = T;
 
 /**
  * 4x4 Matrix math math functions.
@@ -32,18 +31,7 @@ export type Mat4LikeCtor = new (n: number) => Mat4;
  *     mat4.multiply(mat, trans, mat);  // Multiplies mat * trans and puts result in mat.
  *
  */
-let MatType: Mat4LikeCtor = Float32Array;
 
-/**
- * Sets the type this library creates for a Mat4
- * @param ctor - the constructor for the type. Either `Float32Array`, `Float64Array`, or `Array`
- * @returns previous constructor for Mat4
- */
-export function setDefaultType(ctor: new (n: number) => Mat4) {
-  const oldType = MatType;
-  MatType = ctor;
-  return oldType;
-}
 
 /**
  * Create a Mat4 from values
@@ -86,7 +74,7 @@ export function setDefaultType(ctor: new (n: number) => Mat4) {
  * @param v15 - value for element 15
  * @returns created from values.
  */
-export function create(
+function create(
     v0?: number, v1?: number, v2?: number, v3?: number,
     v4?: number, v5?: number, v6?: number, v7?: number,
     v8?: number, v9?: number, v10?: number, v11?: number,
@@ -166,7 +154,7 @@ export function create(
  * @param dst - matrix to hold result. If not passed a new one is created.
  * @returns Mat4 created from values.
  */
-export function set(
+function set(
     v0: number, v1: number, v2: number, v3: number,
     v4: number, v5: number, v6: number, v7: number,
     v8: number, v9: number, v10: number, v11: number,
@@ -188,7 +176,7 @@ export function set(
  * @param dst - matrix to hold result. If not passed a new one is created.
  * @returns Mat4 made from m3
  */
-export function fromMat3(m3: Mat3, dst?: Mat4): Mat4 {
+function fromMat3(m3: Mat3, dst?: Mat4): Mat4 {
   dst = dst || new MatType(16);
 
   dst[ 0] = m3[0];  dst[ 1] = m3[1];  dst[ 2] = m3[ 2];  dst[ 3] = 0;
@@ -205,7 +193,7 @@ export function fromMat3(m3: Mat3, dst?: Mat4): Mat4 {
  * @param dst - matrix to hold result. If not passed a new one is created.
  * @returns Mat4 made from q
  */
-export function fromQuat(q: Quat, dst?: Mat4): Mat4 {
+function fromQuat(q: Quat, dst?: Mat4): Mat4 {
   dst = dst || new MatType(16);
 
   const x = q[0]; const y = q[1]; const z = q[2]; const w = q[3];
@@ -235,7 +223,7 @@ export function fromQuat(q: Quat, dst?: Mat4): Mat4 {
  * @param dst - matrix to hold result. If not passed a new one is created.
  * @returns -m.
  */
-export function negate(m: Mat4, dst?: Mat4): Mat4 {
+function negate(m: Mat4Arg, dst?: Mat4): Mat4 {
   dst = dst || new MatType(16);
 
   dst[ 0] = -m[ 0];  dst[ 1] = -m[ 1];  dst[ 2] = -m[ 2];  dst[ 3] = -m[ 3];
@@ -253,7 +241,7 @@ export function negate(m: Mat4, dst?: Mat4): Mat4 {
  * @param dst - The matrix. If not passed a new one is created.
  * @returns A copy of m.
  */
-export function copy(m: Mat4, dst?: Mat4): Mat4 {
+function copy(m: Mat4Arg, dst?: Mat4): Mat4 {
   dst = dst || new MatType(16);
 
   dst[ 0] = m[ 0];  dst[ 1] = m[ 1];  dst[ 2] = m[ 2];  dst[ 3] = m[ 3];
@@ -271,7 +259,7 @@ export function copy(m: Mat4, dst?: Mat4): Mat4 {
  * @param dst - The matrix. If not passed a new one is created.
  * @returns A copy of m.
  */
-export const clone = copy;
+const clone = copy;
 
 /**
  * Check if 2 matrices are approximately equal
@@ -279,7 +267,7 @@ export const clone = copy;
  * @param b - Operand matrix.
  * @returns true if matrices are approximately equal
  */
-export function equalsApproximately(a: Mat4, b: Mat4): boolean {
+function equalsApproximately(a: Mat4Arg, b: Mat4Arg): boolean {
   return Math.abs(a[ 0] - b[ 0]) < utils.EPSILON &&
          Math.abs(a[ 1] - b[ 1]) < utils.EPSILON &&
          Math.abs(a[ 2] - b[ 2]) < utils.EPSILON &&
@@ -304,7 +292,7 @@ export function equalsApproximately(a: Mat4, b: Mat4): boolean {
  * @param b - Operand matrix.
  * @returns true if matrices are exactly equal
  */
-export function equals(a: Mat4, b: Mat4): boolean {
+function equals(a: Mat4Arg, b: Mat4Arg): boolean {
   return a[ 0] === b[ 0] &&
          a[ 1] === b[ 1] &&
          a[ 2] === b[ 2] &&
@@ -329,7 +317,7 @@ export function equals(a: Mat4, b: Mat4): boolean {
  * @param dst - matrix to hold result. If not passed a new one is created.
  * @returns A 4-by-4 identity matrix.
  */
-export function identity(dst?: Mat4): Mat4 {
+function identity(dst?: Mat4): Mat4 {
   dst = dst || new MatType(16);
 
   dst[ 0] = 1;  dst[ 1] = 0;  dst[ 2] = 0;  dst[ 3] = 0;
@@ -346,7 +334,7 @@ export function identity(dst?: Mat4): Mat4 {
  * @param dst - matrix to hold result. If not passed a new one is created.
  * @returns The transpose of m.
  */
-export function transpose(m: Mat4, dst?: Mat4): Mat4 {
+function transpose(m: Mat4Arg, dst?: Mat4): Mat4 {
   dst = dst || new MatType(16);
   if (dst === m) {
     let t;
@@ -408,7 +396,7 @@ export function transpose(m: Mat4, dst?: Mat4): Mat4 {
  * @param dst - matrix to hold result. If not passed a new one is created.
  * @returns The inverse of m.
  */
-export function inverse(m: Mat4, dst?: Mat4): Mat4 {
+function inverse(m: Mat4Arg, dst?: Mat4): Mat4 {
   dst = dst || new MatType(16);
 
   const m00 = m[0 * 4 + 0];
@@ -500,7 +488,7 @@ export function inverse(m: Mat4, dst?: Mat4): Mat4 {
  * @param m - the matrix
  * @returns the determinant
  */
-export function determinant(m: Mat4): number {
+function determinant(m: Mat4Arg): number {
   const m00 = m[0 * 4 + 0];
   const m01 = m[0 * 4 + 1];
   const m02 = m[0 * 4 + 2];
@@ -549,7 +537,7 @@ export function determinant(m: Mat4): number {
  * @param dst - matrix to hold result. If not passed a new one is created.
  * @returns The inverse of m.
  */
-export const invert = inverse;
+const invert = inverse;
 
 /**
  * Multiplies two 4-by-4 matrices with a on the left and b on the right
@@ -558,7 +546,7 @@ export const invert = inverse;
  * @param dst - matrix to hold result. If not passed a new one is created.
  * @returns The matrix product of a and b.
  */
-export function multiply(a: Mat4, b: Mat4, dst?: Mat4): Mat4 {
+function multiply(a: Mat4Arg, b: Mat4Arg, dst?: Mat4): Mat4 {
   dst = dst || new MatType(16);
 
   const a00 = a[0];
@@ -621,7 +609,7 @@ export function multiply(a: Mat4, b: Mat4, dst?: Mat4): Mat4 {
  * @param dst - matrix to hold result. If not passed a new one is created.
  * @returns The matrix product of a and b.
  */
-export const mul = multiply;
+const mul = multiply;
 
 /**
  * Sets the translation component of a 4-by-4 matrix to the given
@@ -631,7 +619,7 @@ export const mul = multiply;
  * @param dst - matrix to hold result. If not passed a new one is created.
  * @returns The matrix with translation set.
  */
-export function setTranslation(a: Mat4, v: Vec3, dst?: Mat4): Mat4 {
+function setTranslation(a: Mat4Arg, v: Vec3, dst?: Mat4): Mat4 {
   dst = dst || identity();
   if (a !== dst) {
     dst[ 0] = a[ 0];
@@ -661,7 +649,7 @@ export function setTranslation(a: Mat4, v: Vec3, dst?: Mat4): Mat4 {
  * @param dst - vector to hold result. If not passed a new one is created.
  * @returns The translation component of m.
  */
-export function getTranslation(m: Mat4, dst?: Vec3): Vec3 {
+function getTranslation(m: Mat4Arg, dst?: Vec3): Vec3 {
   dst = dst || vec3.create();
   dst[0] = m[12];
   dst[1] = m[13];
@@ -675,7 +663,7 @@ export function getTranslation(m: Mat4, dst?: Vec3): Vec3 {
  * @param axis - The axis 0 = x, 1 = y, 2 = z;
  * @returns The axis component of m.
  */
-export function getAxis(m: Mat4, axis: number, dst?: Vec3): Vec3 {
+function getAxis(m: Mat4Arg, axis: number, dst?: Vec3): Vec3 {
   dst = dst || vec3.create();
   const off = axis * 4;
   dst[0] = m[off + 0];
@@ -692,7 +680,7 @@ export function getAxis(m: Mat4, axis: number, dst?: Vec3): Vec3 {
  * @param dst - The matrix to set. If not passed a new one is created.
  * @returns The matrix with axis set.
  */
-export function setAxis(m: Mat4, v: Vec3, axis: number, dst: Mat4): Mat4 {
+function setAxis(m: Mat4Arg, v: Vec3, axis: number, dst: Mat4): Mat4 {
   if (dst !== m) {
     dst = copy(m, dst);
   }
@@ -708,7 +696,7 @@ export function setAxis(m: Mat4, v: Vec3, axis: number, dst: Mat4): Mat4 {
  * @param m - The Matrix
  * @param dst - The vector to set. If not passed a new one is created.
  */
-export function getScaling(m: Mat4, dst?: Vec3): Vec3 {
+function getScaling(m: Mat4Arg, dst?: Vec3): Vec3 {
   dst = dst || vec3.create();
 
   const xx = m[0];
@@ -753,7 +741,7 @@ export function getScaling(m: Mat4, dst?: Vec3): Vec3 {
  * @param dst - matrix to hold result. If not passed a new one is created.
  * @returns The perspective matrix.
  */
-export function perspective(fieldOfViewYInRadians: number, aspect: number, zNear: number, zFar: number, dst?: Mat4): Mat4 {
+function perspective(fieldOfViewYInRadians: number, aspect: number, zNear: number, zFar: number, dst?: Mat4): Mat4 {
   dst = dst || new MatType(16);
 
   const f = Math.tan(Math.PI * 0.5 - 0.5 * fieldOfViewYInRadians);
@@ -808,7 +796,7 @@ export function perspective(fieldOfViewYInRadians: number, aspect: number, zNear
  *     of the far clipping plane. (default = Infinity)
  * @param dst - matrix to hold result. If not passed a new one is created.
  * @returns The perspective matrix.
- */export function perspectiveReverseZ(fieldOfViewYInRadians: number, aspect: number, zNear: number, zFar = Infinity, dst?: Mat4) {
+ */function perspectiveReverseZ(fieldOfViewYInRadians: number, aspect: number, zNear: number, zFar = Infinity, dst?: Mat4) {
   dst = dst || new MatType(16);
 
   const f = 1 / Math.tan(fieldOfViewYInRadians * 0.5);
@@ -858,7 +846,7 @@ export function perspective(fieldOfViewYInRadians: number, aspect: number, zNear
  * @param dst - Output matrix. If not passed a new one is created.
  * @returns The orthographic projection matrix.
  */
-export function ortho(left: number, right: number, bottom: number, top: number, near: number, far: number, dst?: Mat4): Mat4 {
+function ortho(left: number, right: number, bottom: number, top: number, near: number, far: number, dst?: Mat4): Mat4 {
   dst = dst || new MatType(16);
 
   dst[0]  = 2 / (right - left);
@@ -902,7 +890,7 @@ export function ortho(left: number, right: number, bottom: number, top: number, 
  * @param dst - Output matrix. If not passed a new one is created.
  * @returns The perspective projection matrix.
  */
-export function frustum(left: number, right: number, bottom: number, top: number, near: number, far: number, dst?: Mat4): Mat4 {
+function frustum(left: number, right: number, bottom: number, top: number, near: number, far: number, dst?: Mat4): Mat4 {
   dst = dst || new MatType(16);
 
   const dx = (right - left);
@@ -947,7 +935,7 @@ export function frustum(left: number, right: number, bottom: number, top: number
  * @param dst - Output matrix. If not passed a new one is created.
  * @returns The perspective projection matrix.
  */
-export function frustumReverseZ(left: number, right: number, bottom: number, top: number, near: number, far = Infinity, dst?: Mat4): Mat4 {
+function frustumReverseZ(left: number, right: number, bottom: number, top: number, near: number, far = Infinity, dst?: Mat4): Mat4 {
   dst = dst || new MatType(16);
 
   const dx = (right - left);
@@ -998,7 +986,7 @@ let zAxis: Vec3;
  * @param dst - matrix to hold result. If not passed a new one is created.
  * @returns The aim matrix.
  */
-export function aim(position: Vec3, target: Vec3, up: Vec3, dst?: Mat4): Mat4 {
+function aim(position: Vec3, target: Vec3, up: Vec3, dst?: Mat4): Mat4 {
   dst = dst || new MatType(16);
 
   xAxis = xAxis || vec3.create();
@@ -1031,7 +1019,7 @@ export function aim(position: Vec3, target: Vec3, up: Vec3, dst?: Mat4): Mat4 {
  * @param dst - matrix to hold result. If not passed a new one is created.
  * @returns The aim matrix.
  */
-export function cameraAim(eye: Vec3, target: Vec3, up: Vec3, dst?: Mat4): Mat4 {
+function cameraAim(eye: Vec3, target: Vec3, up: Vec3, dst?: Mat4): Mat4 {
   dst = dst || new MatType(16);
 
   xAxis = xAxis || vec3.create();
@@ -1062,7 +1050,7 @@ export function cameraAim(eye: Vec3, target: Vec3, up: Vec3, dst?: Mat4): Mat4 {
  * @param dst - matrix to hold result. If not passed a new one is created.
  * @returns The look-at matrix.
  */
-export function lookAt(eye: Vec3, target: Vec3, up: Vec3, dst?: Mat4): Mat4 {
+function lookAt(eye: Vec3, target: Vec3, up: Vec3, dst?: Mat4): Mat4 {
   dst = dst || new MatType(16);
 
   xAxis = xAxis || vec3.create();
@@ -1092,7 +1080,7 @@ export function lookAt(eye: Vec3, target: Vec3, up: Vec3, dst?: Mat4): Mat4 {
  * @param dst - matrix to hold result. If not passed a new one is created.
  * @returns The translation matrix.
  */
-export function translation(v: Vec3, dst?: Mat4): Mat4 {
+function translation(v: Vec3, dst?: Mat4): Mat4 {
   dst = dst || new MatType(16);
 
   dst[ 0] = 1;     dst[ 1] = 0;     dst[ 2] = 0;     dst[ 3] = 0;
@@ -1111,7 +1099,7 @@ export function translation(v: Vec3, dst?: Mat4): Mat4 {
  * @param dst - matrix to hold result. If not passed a new one is created.
  * @returns The translated matrix.
  */
-export function translate(m: Mat4, v: Vec3, dst?: Mat4): Mat4 {
+function translate(m: Mat4Arg, v: Vec3, dst?: Mat4): Mat4 {
   dst = dst || new MatType(16);
 
   const v0 = v[0];
@@ -1163,7 +1151,7 @@ export function translate(m: Mat4, v: Vec3, dst?: Mat4): Mat4 {
  * @param dst - matrix to hold result. If not passed a new one is created.
  * @returns The rotation matrix.
  */
-export function rotationX(angleInRadians: number, dst?: Mat4): Mat4 {
+function rotationX(angleInRadians: number, dst?: Mat4): Mat4 {
   dst = dst || new MatType(16);
 
   const c = Math.cos(angleInRadians);
@@ -1185,7 +1173,7 @@ export function rotationX(angleInRadians: number, dst?: Mat4): Mat4 {
  * @param dst - matrix to hold result. If not passed a new one is created.
  * @returns The rotated matrix.
  */
-export function rotateX(m: Mat4, angleInRadians: number, dst?: Mat4): Mat4 {
+function rotateX(m: Mat4Arg, angleInRadians: number, dst?: Mat4): Mat4 {
   dst = dst || new MatType(16);
 
   const m10 = m[4];
@@ -1228,7 +1216,7 @@ export function rotateX(m: Mat4, angleInRadians: number, dst?: Mat4): Mat4 {
  * @param dst - matrix to hold result. If not passed a new one is created.
  * @returns The rotation matrix.
  */
-export function rotationY(angleInRadians: number, dst?: Mat4): Mat4 {
+function rotationY(angleInRadians: number, dst?: Mat4): Mat4 {
   dst = dst || new MatType(16);
 
   const c = Math.cos(angleInRadians);
@@ -1250,7 +1238,7 @@ export function rotationY(angleInRadians: number, dst?: Mat4): Mat4 {
  * @param dst - matrix to hold result. If not passed a new one is created.
  * @returns The rotated matrix.
  */
-export function rotateY(m: Mat4, angleInRadians: number, dst?: Mat4): Mat4 {
+function rotateY(m: Mat4Arg, angleInRadians: number, dst?: Mat4): Mat4 {
   dst = dst || new MatType(16);
 
   const m00 = m[0 * 4 + 0];
@@ -1293,7 +1281,7 @@ export function rotateY(m: Mat4, angleInRadians: number, dst?: Mat4): Mat4 {
  * @param dst - matrix to hold result. If not passed a new one is created.
  * @returns The rotation matrix.
  */
-export function rotationZ(angleInRadians: number, dst?: Mat4): Mat4 {
+function rotationZ(angleInRadians: number, dst?: Mat4): Mat4 {
   dst = dst || new MatType(16);
 
   const c = Math.cos(angleInRadians);
@@ -1315,7 +1303,7 @@ export function rotationZ(angleInRadians: number, dst?: Mat4): Mat4 {
  * @param dst - matrix to hold result. If not passed a new one is created.
  * @returns The rotated matrix.
  */
-export function rotateZ(m: Mat4, angleInRadians: number, dst?: Mat4): Mat4 {
+function rotateZ(m: Mat4Arg, angleInRadians: number, dst?: Mat4): Mat4 {
   dst = dst || new MatType(16);
 
   const m00 = m[0 * 4 + 0];
@@ -1362,7 +1350,7 @@ export function rotateZ(m: Mat4, angleInRadians: number, dst?: Mat4): Mat4 {
  * @returns A matrix which rotates angle radians
  *     around the axis.
  */
-export function axisRotation(axis: Vec3, angleInRadians: number, dst?: Mat4): Mat4 {
+function axisRotation(axis: Vec3, angleInRadians: number, dst?: Mat4): Mat4 {
   dst = dst || new MatType(16);
 
   let x = axis[0];
@@ -1409,7 +1397,7 @@ export function axisRotation(axis: Vec3, angleInRadians: number, dst?: Mat4): Ma
  * @returns A matrix which rotates angle radians
  *     around the axis.
  */
-export const rotation = axisRotation;
+const rotation = axisRotation;
 
 /**
  * Rotates the given 4-by-4 matrix around the given axis by the
@@ -1421,7 +1409,7 @@ export const rotation = axisRotation;
  * @param dst - matrix to hold result. If not passed a new one is created.
  * @returns The rotated matrix.
  */
-export function axisRotate(m: Mat4, axis: Vec3, angleInRadians: number, dst?: Mat4): Mat4 {
+function axisRotate(m: Mat4Arg, axis: Vec3, angleInRadians: number, dst?: Mat4): Mat4 {
   dst = dst || new MatType(16);
 
   let x = axis[0];
@@ -1494,7 +1482,7 @@ export function axisRotate(m: Mat4, axis: Vec3, angleInRadians: number, dst?: Ma
  * @param dst - matrix to hold result. If not passed a new one is created.
  * @returns The rotated matrix.
  */
-export const rotate = axisRotate;
+const rotate = axisRotate;
 
 /**
  * Creates a 4-by-4 matrix which scales in each dimension by an amount given by
@@ -1505,7 +1493,7 @@ export const rotate = axisRotate;
  * @param dst - matrix to hold result. If not passed a new one is created.
  * @returns The scaling matrix.
  */
-export function scaling(v: Vec3, dst?: Mat4): Mat4 {
+function scaling(v: Vec3, dst?: Mat4): Mat4 {
   dst = dst || new MatType(16);
 
   dst[ 0] = v[0];  dst[ 1] = 0;     dst[ 2] = 0;     dst[ 3] = 0;
@@ -1526,7 +1514,7 @@ export function scaling(v: Vec3, dst?: Mat4): Mat4 {
  * @param dst - matrix to hold result. If not passed a new one is created.
  * @returns The scaled matrix.
  */
-export function scale(m: Mat4, v: Vec3, dst?: Mat4): Mat4 {
+function scale(m: Mat4Arg, v: Vec3, dst?: Mat4): Mat4 {
   dst = dst || new MatType(16);
 
   const v0 = v[0];
@@ -1562,7 +1550,7 @@ export function scale(m: Mat4, v: Vec3, dst?: Mat4): Mat4 {
  * @param dst - matrix to hold result. If not passed a new one is created.
  * @returns The scaling matrix.
  */
-export function uniformScaling(s: number, dst?: Mat4): Mat4 {
+function uniformScaling(s: number, dst?: Mat4): Mat4 {
   dst = dst || new MatType(16);
 
   dst[ 0] = s;  dst[ 1] = 0;  dst[ 2] = 0;  dst[ 3] = 0;
@@ -1580,7 +1568,7 @@ export function uniformScaling(s: number, dst?: Mat4): Mat4 {
  * @param dst - matrix to hold result. If not passed a new one is created.
  * @returns The scaled matrix.
  */
-export function uniformScale(m: Mat4, s: number, dst?: Mat4): Mat4 {
+function uniformScale(m: Mat4Arg, s: number, dst?: Mat4): Mat4 {
   dst = dst || new MatType(16);
 
   dst[ 0] = s * m[0 * 4 + 0];
@@ -1605,3 +1593,54 @@ export function uniformScale(m: Mat4, s: number, dst?: Mat4): Mat4 {
 
   return dst;
 }
+
+return {
+  create,
+  set,
+  fromMat3,
+  fromQuat,
+  negate,
+  copy,
+  clone,
+  equalsApproximately,
+  equals,
+  identity,
+  transpose,
+  inverse,
+  determinant,
+  invert,
+  multiply,
+  mul,
+  setTranslation,
+  getTranslation,
+  getAxis,
+  setAxis,
+  getScaling,
+  perspective,
+  perspectiveReverseZ,
+  ortho,
+  frustum,
+  frustumReverseZ,
+  aim,
+  cameraAim,
+  lookAt,
+  translation,
+  translate,
+  rotationX,
+  rotateX,
+  rotationY,
+  rotateY,
+  rotationZ,
+  rotateZ,
+  axisRotation,
+  rotation,
+  axisRotate,
+  rotate,
+  scaling,
+  scale,
+  uniformScaling,
+  uniformScale,
+  getAPI,
+};
+}
+

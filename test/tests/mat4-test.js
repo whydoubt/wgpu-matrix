@@ -1,29 +1,25 @@
-import {mat4, mat3, quat, utils, vec3} from '../../dist/2.x/wgpu-matrix.module.js';
+import {mat4, mat4d, mat4n, mat3, quat, utils, vec3} from '../../dist/2.x/wgpu-matrix.module.js';
 
 import {
   assertEqual,
   assertEqualApproximately,
   assertFalsy,
-  assertIsArray,
-  assertInstanceOf,
   assertStrictEqual,
   assertStrictNotEqual,
   assertTruthy,
 } from '../assert.js';
-import {describe, it, before} from '../mocha-support.js';
+import {describe, it} from '../mocha-support.js';
 
-function check(Type) {
-  describe('using ' + Type, () => {
+
+function check(mat4) {
+
+  describe('using ' + mat4.identity().constructor.name, () => {
     const m = [
        0,  1,  2,  3,
        4,  5,  6,  7,
        8,  9, 10, 11,
       12, 13, 14, 15,
     ];
-
-    before(function () {
-      mat4.setDefaultType(Type);
-    });
 
     function testMat4WithoutDest(func, expected, ...args) {
       const d = func(...args);
@@ -39,7 +35,7 @@ function check(Type) {
     }
 
     function testMat4WithAndWithoutDest(func, expected, ...args) {
-      if (Type === Float32Array) {
+      if (mat4.identity() instanceof Float32Array) {
         expected = new Float32Array(expected);
       }
       testMat4WithoutDest(func, expected, ...args);
@@ -80,7 +76,7 @@ function check(Type) {
     it('should create', () => {
       for (let i = 0; i <= 16; ++i) {
         const expected = mat4.clone(new Array(16).fill(0).map((_, ndx) => ndx < i ? ndx + 1 : 0));
-        const args = new Array(Type === Array ? 16 : i).fill(0).map((_, ndx) => ndx < i ? ndx + 1 : 0);
+        const args = new Array(Array.isArray(mat4.identity()) ? 16 : i).fill(0).map((_, ndx) => ndx < i ? ndx + 1 : 0);
         const m = mat4.create(...args);
         assertEqual(m, expected);
       }
@@ -909,9 +905,7 @@ function check(Type) {
     it('should rotate x', () => {
       const angle = 1.23;
       // switch to Array type to keep precision high for expected
-      const oldType = mat4.setDefaultType(Array);
-      const expected = mat4.multiply(m, mat4.rotationX(angle));
-      mat4.setDefaultType(oldType);
+      const expected = mat4.multiply(m, mat4.rotationX(angle, []));
 
       testMat4WithAndWithoutDest((dst) => {
         return mat4.rotateX(m, angle, dst);
@@ -936,9 +930,7 @@ function check(Type) {
     it('should rotate y', () => {
       const angle = 1.23;
       // switch to Array type to keep precision high for expected
-      const oldType = mat4.setDefaultType(Array);
-      const expected = mat4.multiply(m, mat4.rotationY(angle));
-      mat4.setDefaultType(oldType);
+      const expected = mat4.multiply(m, mat4.rotationY(angle, new Array(16)));
 
       testMat4WithAndWithoutDest((dst) => {
         return mat4.rotateY(m, angle, dst);
@@ -963,9 +955,7 @@ function check(Type) {
     it('should rotate z', () => {
       const angle = 1.23;
       // switch to Array type to keep precision high for expected
-      const oldType = mat4.setDefaultType(Array);
-      const expected = mat4.multiply(m, mat4.rotationZ(angle));
-      mat4.setDefaultType(oldType);
+      const expected = mat4.multiply(m, mat4.rotationZ(angle, new Array(16)));
 
       testMat4WithAndWithoutDest((dst) => {
         return mat4.rotateZ(m, angle, dst);
@@ -1015,9 +1005,7 @@ function check(Type) {
       const axis = [0.5, 0.6, -0.7];
       const angle = 1.23;
       // switch to Array type to keep precision high for expected
-      const oldType = mat4.setDefaultType(Array);
-      const expected = mat4.multiply(m, mat4.axisRotation(axis, angle));
-      mat4.setDefaultType(oldType);
+      const expected = mat4.multiply(m, mat4.axisRotation(axis, angle, new Array(16)));
 
       testMat4WithAndWithoutDest((dst) => {
         return mat4.axisRotate(m, axis, angle, dst);
@@ -1105,18 +1093,8 @@ function check(Type) {
 }
 
 describe('mat4', () => {
-
-  it('should set default type', () => {
-    mat4.setDefaultType(Array);
-    let d = mat4.identity();
-    assertIsArray(d);
-    mat4.setDefaultType(Float32Array);
-    d = mat4.identity();
-    assertInstanceOf(d, Float32Array);
-  });
-
-  check(Array);
-  check(Float32Array);
-  check(Float64Array);
+  check(mat4n);
+  check(mat4);
+  check(mat4d);
 });
 

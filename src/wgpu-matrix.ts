@@ -1,5 +1,5 @@
 import Mat3, * as mat3 from './mat3-impl';
-import Mat4, * as mat4 from './mat4-impl';
+import {Mat4, mat4, mat4d, mat4n, Mat4Arg} from './mat4';
 import Quat, * as quat from './quat-impl';
 import Vec2, * as vec2 from './vec2-impl';
 import Vec3, * as vec3 from './vec3-impl';
@@ -19,7 +19,7 @@ import * as utils from './utils';
  */
 export function setDefaultType(ctor: new (n: number) => Float32Array | Float64Array | number[]) {
   mat3.setDefaultType(ctor);
-  mat4.setDefaultType(ctor);
+  //mat4.setDefaultType(ctor);
   quat.setDefaultType(ctor);
   vec2.setDefaultType(ctor);
   vec3.setDefaultType(ctor);
@@ -28,9 +28,12 @@ export function setDefaultType(ctor: new (n: number) => Float32Array | Float64Ar
 
 export {
   Mat3,
+  Mat4Arg,
   mat3,
   Mat4,
   mat4,
+  mat4d,
+  mat4n,
   Quat,
   quat,
   utils,

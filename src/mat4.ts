@@ -25,4 +25,12 @@
  * When created by the library will create the default type which is `Float32Array`
  * but can be set by calling {@link mat4.setDefaultType}.
  */
-export type Mat4 = number[] | Float32Array | Float64Array;
+import {getAPI} from './mat4-impl';
+
+export const mat4 = getAPI(Float32Array);
+export const mat4d = getAPI(Float64Array);
+export const mat4n = getAPI(Array);
+//export default mat4;
+export type Mat4 = ReturnType<typeof mat4.create>;
+export type Mat4Arg = number[] | Float32Array | Float64Array;
+export { getAPI };
